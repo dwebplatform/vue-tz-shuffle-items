@@ -6,19 +6,19 @@
           {{product.name}}
         </div>
         <button class="list-dashboard__shuffle-btn"
-        @click="toggleShuffled"
-        >{{isShuffled ? 'Отсортировать':'Перемешать'}}</button>
+        @click="toggleShuffled(product.id)"
+        >{{product.isShuffled ? 'Отсортировать':'Перемешать'}}</button>
       </div>
       <div   class="list-dashboard__ordered-items">
-        <div v-for="char in activeChars(product)" :key="char.id"  class="list-dashboard__ordered-item">
-          <div v-if="!isShuffled" class="list-dashboard__ordered-item-active-char">
-            <div v-for="index in new Array(char.value)" :key="index" class="list-dashboard__char-box"
+        <div v-for="char in product.chars.filter((c)=>c.isActive)" :key="char.id"  class="list-dashboard__ordered-item">
+          <div v-if="!product.isShuffled" class="list-dashboard__ordered-item-active-char">
+            <div v-for="index in getArrayFromChar(char)" :key="index" class="list-dashboard__char-box"
               :style="{backgroundColor: char.color}"
             />
           </div>
-        </div>   
-        <div v-if="isShuffled" class="list-dashboard__ordered-item-shuffled-char">
-        <div v-for="(color,index) in shuffledActiveChars(product)" :key="index" 
+        </div>  
+        <div v-if="product.isShuffled" class="list-dashboard__ordered-item-shuffled-char">
+        <div v-for="(color,index) in product.shuffledChars" :key="index" 
          class="list-dashboard__char-box"
             :style="{backgroundColor: color}"
         ></div>
@@ -34,82 +34,23 @@ export default {
     products: Array
   },
   methods: {
-    shuffleArray(array){
-      return array.sort(() => 0.5 - Math.random())
+    getArrayFromChar(char){
+      if(!char.value){
+        return [];
+      }
+      return new Array(char.value);
     },
-    toggleShuffled(){
-      this.isShuffled = !this.isShuffled;
+    toggleShuffled(productId){
+      this.$emit('handleToggleShuffled',productId);
+      // this.isShuffled = !this.isShuffled;
     },
-    shuffledActiveChars(product){
-        const activeChars = this.activeChars(product);
-        let shuffledChars = [];
-        activeChars.forEach(({value, color})=>{
-          console.log(value,color)
-          let coloriesedArray = [...new Array(value)].map(()=>color);
-          shuffledChars =  shuffledChars.concat(coloriesedArray);
-        }) 
-        return this.shuffleArray(shuffledChars);
-    },
-    activeChars(product){
-        if(!product.chars){
-          return [];
-        }
-        return product.chars.filter((char=>char.isActive ))
-      },
       showedProducts(products){
         return products.filter(p=>p.isShowed)
       }
   },
  
   data(){
-    return {
-      isShuffled: false,
-      name:'Лист 2',
-      isShowed: false,
-        items:[{
-          id:1,
-          name:'Характеристика 1',
-          value: 6,
-          color: 'red',
-          isActive: true
-        },
-        {
-          id:2,
-          name:'Характеристика 2',
-          value: 14,
-          color: 'green',
-          isActive: false
-        },
-        {
-          id:3,
-          name:'Характеристика 3',
-          value: 4,
-          color: 'yellow',
-          isActive: false
-        },
-        {
-          id:4,
-          name:'Характеристика 4',
-          value: 4,
-          color: 'green',
-          isActive: false
-        },
-         {
-          id:5,
-          name:'Характеристика 5',
-          value: 12,
-          color: 'brown',
-          isActive: false
-        },
-         {
-          id:6,
-          name:'Характеристика 6',
-          value: 7,
-          color: 'red',
-          isActive: false
-        }
-        ]
-      }
+    return {}
     }
 }
 </script>
@@ -138,7 +79,10 @@ export default {
         margin-bottom: 8px
     &__ordered-item-shuffled-char
         width: 100%
+        padding-top: 5px
         display: flex
+        flex-wrap: wrap
+        gap: 1px
     &__char-box
         width: 10px
         height: 10px
