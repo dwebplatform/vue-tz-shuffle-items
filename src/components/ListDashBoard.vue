@@ -44,8 +44,16 @@ export default {
       this.$emit('handleToggleShuffled',productId);
       // this.isShuffled = !this.isShuffled;
     },
+    activeChars(product){
+        if(!product.chars ||!product.chars.length){
+          return false;
+        }
+
+        return product.chars.filter((char=>char.isActive )).length>0? true: false;
+      },
       showedProducts(products){
-        return products.filter(p=>p.isShowed)
+        
+        return products.filter(this.activeChars);
       }
   },
  

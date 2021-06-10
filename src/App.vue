@@ -47,6 +47,9 @@ export default {
         const activeChars = this.activeChars(product);
         let shuffledChars = [];
         activeChars.forEach(({value, color})=>{
+          if(!value){
+            return;
+          }
           let coloriesedArray = [...new Array(value)].map(()=>color);
           shuffledChars =  shuffledChars.concat(coloriesedArray);
         }); 
